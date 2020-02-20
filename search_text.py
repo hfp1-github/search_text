@@ -119,6 +119,7 @@ class Application(tk.Frame):
     def search_main(self):
         # dbからentryのtextを検索してリストボックスに入れる
         query = self.en.get()
+        self.last_selected_lbox_idx = 0
         if query == "":  # 空になった時の処理
             self.find_indexces_list = None
             self.display_all()
@@ -150,7 +151,7 @@ class Application(tk.Frame):
 
     def save_edit_text(self):
         # リストボックスで選択したテキスト取得
-        selected_idx = self.lbox.curselection()[0]
+        selected_idx = self.last_selected_lbox_idx
         new_block = re.findall(".*\n", self.tbox.get("1.0", "end"))
         db_idx = self.listbox_db_idx_map[selected_idx] # dbのidxに変換
         self.db.change_block(db_idx, new_block, True)
@@ -173,7 +174,8 @@ class Application(tk.Frame):
         selected_idx = self.lbox.curselection()
         if len(selected_idx) == 0:
             return
-        selected_idx = selected_idx[0]
+        selected_idx = self.lbox.curselection()[0]
+        self.last_selected_lbox_idx = selected_idx
         words = self.lbox.get(selected_idx)
         if self.find_indexces_list:
             self.update_textbox(words, self.find_indexces_list[selected_idx])
