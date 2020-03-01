@@ -93,13 +93,18 @@ class Textdb:
                     f.writelines(block)
 
     def append_block(self, filepath, lines):
+        if type(lines) != list:  # 改行でsplitしたリストに変換
+            lines = re.findall(".*\n", lines)
+        new_key = max(self.db.keys())+1
+        self.db[new_key] = lines
+        self.db_small[new_key] = [line.lower() for line in lines]
+        self.path_idx_map[filepath].append(new_key)
+
         """ filepathにlinesを付加する。 """
         if not os.path.exists(filepath):
             print("{}is not found.".format(filepath))
             return
 
-        if type(lines) != list:  # 改行でsplitしたリストに変換
-            lines = re.findall(".*\n", lines)
 
         # ファイルの末尾にデリミタが存在するか確認。無ければ追加する。
         with open(filepath, "a+", encoding="utf-8") as f:  # 読み書きモード
@@ -218,7 +223,7 @@ class Textdb:
 
 if __name__ == "__main__":
     db = Textdb(debugfilepaths)
-    db.change_block(15, ["bb\n", "cc\n"], True)
+    # db.change_block(15, ["bb\n", "cc\n"], True)
     # a = db.search2("git")
     # b = db.getpath_from_idx(1)
     # db.append_block("huge.txt", ["hoge\n", "huga"])
